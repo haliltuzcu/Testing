@@ -2,6 +2,8 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import AnonymousUser
+
+from flight.views import FlightView
 # Create your tests here.
 class FlightTestCase(APITestCase):
     def setUp(self):
@@ -9,3 +11,12 @@ class FlightTestCase(APITestCase):
     def test_flight_list_as_non_authenticated_user(self):
         request = self.factory.get('/flight/flights/')
         request.user = AnonymousUser()
+        response = FlightView.as_view({'get': 'list'})(request)
+        self.assertEqual(response.status_code, 200)
+   
+   
+    def test_flight_list_as_guest_authenticated_user(self):
+        request = self.factory.post('/flight/flights/')
+        request.user = AnonymousUser()
+        response = FlightView.as_view({'post': 'create'})(request)
+        self.assertEqual(response.status_code, 401)
